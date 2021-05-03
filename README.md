@@ -99,7 +99,7 @@ Releasing your application on Google Play is a simple process that involves thre
     If you are satisfied that your publishing settings are correctly configured and your uploaded application is ready to be released to the public, you can simply click Publish in the Play Console and within minutes your application will be live and available for download around the world.
 
 ## The big release day
-
+https://positive-stud.medium.com/how-to-publish-an-android-app-on-google-play-store-cd163919e4d2
 
 ## References
 
