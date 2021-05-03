@@ -66,6 +66,67 @@ $ zipalign -v 4 HelloWorld-release-unsigned.apk HelloWorld.apk
 ## This generates a final release binary called HelloWorld.apk that can be accepted into the Google Play Store.
 ```
 
+
+UPDATE 
+
+ANDROID RELEASE BUILD (ALWAYS RUN AS ADMIN) 
+================================================== 
+    Go to folder projecty-app-client (IGNORE COPY ERROR AFTER BUILD) 
+        Open file config.xml and increment android-versionCode with +1 
+        npm run cordova:build android --release 
+    Go to folder \platforms\android\app\build\outputs\apk\release 
+        Copy file app-release-unsigned.apk 
+    Go to folder C:\Program Files\Java\jdk1.8.0_231\bin 
+        Delete app-release-unsigned.apk if file exists. 
+        Paste file app-release-unsigned.apk 
+        jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore app-release-unsigned.apk alias_name 
+        Copy file app-release-unsigned.apk 
+    Go to folder C:\Program Files (x86)\Android\android-sdk\build-tools\28.0.3 
+        Delete app-release-unsigned.apk if file exists. 
+        Delete Welever.apk if file exists. 
+        Paste file app-release-unsigned.apk 
+        zipalign -v 4 app-release-unsigned.apk Welever.apk 
+        apksigner verify --verbose Welever.apk 
+ 
+
+NEW (FROM SCRATCH) 
+
+ANDROID RELEASE BUILD (ALWAYS RUN AS ADMIN) 
+================================================== 
+    Go to folder projecty-app-client (IGNORE COPY ERROR AFTER BUILD) 
+        npm run cordova:build android --release 
+    Go to folder \platforms\android\app\build\outputs\apk\release 
+        Copy file app-release-unsigned.apk 
+    Go to folder C:\Program Files\Java\jdk1.8.0_231\bin 
+        Delete app-release-unsigned.apk if file exists. 
+        Delete my-release-key.keystore if file exists. 
+        Paste file app-release-unsigned.apk 
+        keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 
+        keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-release-key.keystore -deststoretype pkcs12 
+        jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore app-release-unsigned.apk alias_name 
+        Copy file app-release-unsigned.apk 
+        Copy file my-release-key.keystore 
+    Go to folder C:\Program Files (x86)\Android\android-sdk\build-tools\28.0.3 
+        Delete app-release-unsigned.apk if file exists. 
+        Delete HelloWorld.apk if file exists. 
+        Delete my-release-key.keystore if file exists. 
+        Delete Welever.apk if file exists. 
+        Paste file app-release-unsigned.apk 
+        Paste file my-release-key.keystore 
+        zipalign -v 4 app-release-unsigned.apk Welever.apk 
+        apksigner verify --verbose Welever.apk 
+ 
+NEW (FROM SCRATCH) 
+IOS RELEASE BUILD (ALWAYS RUN AS ADMIN) 
+================================================== 
+    Go to folder projecty-app-client  
+        npm install 
+        cordova platform rm ios 
+        cordova platform add ios 
+        npm run cordova:build ios –release 
+     Xcode part! 
+
+
 ## Publishing it in the Play Store
 ### Preparing to release
 Preparing your application for release is a multi-step process that involves the following tasks:
