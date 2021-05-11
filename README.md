@@ -14,6 +14,7 @@ Now, talking about generating signed APK files, it is secured by a Keystore cred
 ## Guide to Generate a signed APK using Android Studio
 ```bash
 $ sudo npm i -g @ionic/cli cordova
+$ npm install --save @ngx-rocket/scripts
 $ ionic init
 $ ionic serve   # test
 
