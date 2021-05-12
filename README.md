@@ -1,6 +1,6 @@
 ![](img/Google-Play-Store-Android.png)
 
-# Build and publish an Ionic app in Play Store
+# Build and publish an Ngx-Rocket Ionic app in Play Store
 How to build an Android app in Android Studio and publish it in the Google Play Store.
 
 ## APK file
@@ -12,44 +12,73 @@ As for the developer, an unsigned APK file is developed mainly for local testing
 Now, talking about generating signed APK files, it is secured by a Keystore credential made by the developer and includes a password for the security purpose. Therefore, Signed APK cannot be easily unzipped and mainly used for production purposes. In conclusion, if you are generating a signed APK file, it is more secure and also acceptable in Google Play Store.
 
 ## Guide to Generate a signed APK using Android Studio
+
+First, clone the project, enter the correct branch and install it, npm install, etc.
+Then add the following in the package.json scripts
 ```bash
-$ sudo npm i -g @ionic/cli cordova
-$ npm install --save @ngx-rocket/scripts
-$ ionic init
-$ ionic serve   # test
+"cordova:prepare": "ngx-scripts cordova prepare",
+"cordova:run": "ngx-scripts cordova run",
+"cordova:build": "ngx-scripts cordova build --device --release --copy www",
+"cordova:clean": "ngx-scripts clean",
+"cordova": "ngx-scripts cordova",
+```
 
-## After this, change your ionic.config.json like this
-## Before
-{
-  "name": "ionic-playground",
-  "integrations": {
-    "cordova": {}
-  },
-  "type": "angular"
-}
+After this, just do the following commands:
+```bash
+$ sudo npm i -g cordova                         ## install cordova glboally
+$ sudo add-apt-repository ppa:cwchien/gradle    ## add a gradle ppa repository 
+$ sudo apt update                               ## update apt repositories to get the new ppa
+$ sudo apt install gradle zipalign apksigner    ## install all dependencies to build android
+$ npm run cordova:prepare android               ## add android platform and prepare build
+```
+// Verify where this config.xml file comes from.
+If you are updating an existing app, open file config.xml and increment android-versionCode by 1.
 
-## After
-{
-  "defaultProject": "ionic-playground",
-  "projects": {
-    "ionic-playground": {
-      "name": "ionic-playground",
-      "integrations": {
-        "cordova": {}
-      },
-      "type": "angular"
-    }
-  }
-}
+Else, you will need to generate a Firebase app.         // Verify why need firebase
+```bash
+Firebase part
+Add Procedure:
+    Go to https://firebase.google.com/
+    Click on "GO TO CONSOLE"
+    Click on "Add Project"
+    Project name: Enter: sample-app
+    Click "Create Project" [Takes about 10 seconds or so...]
+    Click "Continue"
+    Click in "Project settings" in the left top, click "Add Firebase to your Android app" (Android symbol)
+    Enter package name for the android app (Same as the id in config.xml if you have this file)
+    Click on download google-services.json
+    Move this file to /platforms/android/app
 
-## For test
-$ ionic cordova prepare android
+Remove Procedure:
+    Go to https://firebase.google.com/
+    Click on "GO TO CONSOLE"
+    Settings -> Project Settings -> Delete this App
+    Settings -> Project Settings -> Delete Project
+    Enter project ID and press delete
+```
 
-## Build
-$ ionic cordova build android --prod --release
+Now we can really build the app:
+```bash
+$ npm run cordova:build android                 ## build android
+```
 
-## Generate a signing key
-$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000
+If build succeed, lets finish it:
+```bash
+## Enter the folder that have the .apk
+$ cd platforms/android/app/build/outputs/apk/release/
+
+## If you are in Windows, do this, else just go ahead
+Copy file app-release-unsigned.apk 
+Go to folder C:\Program Files\Java\jdk1.8.0_231\bin 
+Delete app-release-unsigned.apk if file exists. 
+Delete my-release-key.keystore if file exists. 
+Paste file app-release-unsigned.apk 
+## Windows part ends
+
+## If you are just updating the app, you can skip the next two commands and go right to jarsigner
+## Generate a signing key in JKS format and then convert it to PKCS12
+$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 
+$ keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-release-key.keystore -deststoretype pkcs12 
 
 ## Once this last command has been ran and its prompts have been answered a file called my-release-key.keystore will be created in the current directory. 
 
@@ -59,74 +88,28 @@ $ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg
 ###
 
 ## Sign the app
-$ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore HelloWorld-release-unsigned.apk alias_name
+$ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore app-release-unsigned.apk alias_name 
+
+## If you are in Windows, do this, else just go ahead
+Copy file app-release-unsigned.apk 
+Copy file my-release-key.keystore 
+Go to folder C:\Program Files (x86)\Android\android-sdk\build-tools\28.0.3 
+Delete app-release-unsigned.apk if file exists. 
+Delete HelloWorld.apk if file exists. 
+Delete my-release-key.keystore if file exists. 
+Delete Welever.apk if file exists. 
+Paste file app-release-unsigned.apk 
+Paste file my-release-key.keystore 
+## Windows part ends
 
 ## Optimize the APK
-$ zipalign -v 4 HelloWorld-release-unsigned.apk HelloWorld.apk
+$ zipalign -v 4 app-release-unsigned.apk projecty-signed.apk 
 
-## This generates a final release binary called HelloWorld.apk that can be accepted into the Google Play Store.
+## Verify signature (ignore warnings)
+$ apksigner verify --verbose projecty-signed.apk 
+
+## This generates a final release binary called projecty-signed.apk that can be accepted into the Google Play Store.
 ```
-
-
-UPDATE 
-
-ANDROID RELEASE BUILD (ALWAYS RUN AS ADMIN) 
-================================================== 
-    Go to folder projecty-app-client (IGNORE COPY ERROR AFTER BUILD) 
-        Open file config.xml and increment android-versionCode with +1 
-        npm run cordova:build android --release 
-    Go to folder \platforms\android\app\build\outputs\apk\release 
-        Copy file app-release-unsigned.apk 
-    Go to folder C:\Program Files\Java\jdk1.8.0_231\bin 
-        Delete app-release-unsigned.apk if file exists. 
-        Paste file app-release-unsigned.apk 
-        jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore app-release-unsigned.apk alias_name 
-        Copy file app-release-unsigned.apk 
-    Go to folder C:\Program Files (x86)\Android\android-sdk\build-tools\28.0.3 
-        Delete app-release-unsigned.apk if file exists. 
-        Delete Welever.apk if file exists. 
-        Paste file app-release-unsigned.apk 
-        zipalign -v 4 app-release-unsigned.apk Welever.apk 
-        apksigner verify --verbose Welever.apk 
- 
-
-NEW (FROM SCRATCH) 
-
-ANDROID RELEASE BUILD (ALWAYS RUN AS ADMIN) 
-================================================== 
-    Go to folder projecty-app-client (IGNORE COPY ERROR AFTER BUILD) 
-        npm run cordova:build android --release 
-    Go to folder \platforms\android\app\build\outputs\apk\release 
-        Copy file app-release-unsigned.apk 
-    Go to folder C:\Program Files\Java\jdk1.8.0_231\bin 
-        Delete app-release-unsigned.apk if file exists. 
-        Delete my-release-key.keystore if file exists. 
-        Paste file app-release-unsigned.apk 
-        keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 
-        keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-release-key.keystore -deststoretype pkcs12 
-        jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore app-release-unsigned.apk alias_name 
-        Copy file app-release-unsigned.apk 
-        Copy file my-release-key.keystore 
-    Go to folder C:\Program Files (x86)\Android\android-sdk\build-tools\28.0.3 
-        Delete app-release-unsigned.apk if file exists. 
-        Delete HelloWorld.apk if file exists. 
-        Delete my-release-key.keystore if file exists. 
-        Delete Welever.apk if file exists. 
-        Paste file app-release-unsigned.apk 
-        Paste file my-release-key.keystore 
-        zipalign -v 4 app-release-unsigned.apk Welever.apk 
-        apksigner verify --verbose Welever.apk 
- 
-NEW (FROM SCRATCH) 
-IOS RELEASE BUILD (ALWAYS RUN AS ADMIN) 
-================================================== 
-    Go to folder projecty-app-client  
-        npm install 
-        cordova platform rm ios 
-        cordova platform add ios 
-        npm run cordova:build ios –release 
-     Xcode part! 
-
 
 ## Publishing it in the Play Store
 ### Preparing to release
@@ -168,7 +151,5 @@ https://positive-stud.medium.com/how-to-publish-an-android-app-on-google-play-st
 [Positive stud - What is an APK File? Difference Between Building an Android APK and Generating Signed APK file. (Aug 11, 2020)](https://positive-stud.medium.com/what-is-an-apk-file-difference-between-building-an-android-apk-and-generating-signed-apk-file-3a4bcc380840)
 
 [Google - Publish your app](https://developer.android.com/studio/publish)
-
-
 
 ## Leonardo Zanotti
