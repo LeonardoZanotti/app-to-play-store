@@ -1,6 +1,6 @@
 ![](img/Google-Play-Store-Android.png)
 
-# Build and publish an Ngx-Rocket Ionic app in Play Store
+# Build and publish an Ngx-Rocket Cordova Ionic app in Play Store
 How to build an Android app in Android Studio and publish it in the Google Play Store.
 
 ## APK file
@@ -12,7 +12,6 @@ As for the developer, an unsigned APK file is developed mainly for local testing
 Now, talking about generating signed APK files, it is secured by a Keystore credential made by the developer and includes a password for the security purpose. Therefore, Signed APK cannot be easily unzipped and mainly used for production purposes. In conclusion, if you are generating a signed APK file, it is more secure and also acceptable in Google Play Store.
 
 ## Guide to Generate a signed APK using Android Studio
-
 First, clone the project, enter the correct branch and install it, npm install, etc.
 Then add the following in the package.json scripts
 ```bash
@@ -23,18 +22,21 @@ Then add the following in the package.json scripts
 "cordova": "ngx-scripts cordova",
 ```
 
+To build Android apps you will need [Android SDK](https://developer.android.com/studio).
+
 After this, just do the following commands:
 ```bash
-$ sudo npm i -g cordova                         ## install cordova glboally
 $ sudo add-apt-repository ppa:cwchien/gradle    ## add a gradle ppa repository 
 $ sudo apt update                               ## update apt repositories to get the new ppa
 $ sudo apt install gradle zipalign apksigner    ## install all dependencies to build android
-$ npm run cordova:prepare android               ## add android platform and prepare build
+$ npm i cordova                                 ## add cordova to the project
+$ npm run cordova platform add android          ## add android platform
+$ npm run cordova:prepare android               ## prepare build
 ```
-// Verify where this config.xml file comes from.
+
 If you are updating an existing app, open file config.xml and increment android-versionCode by 1.
 
-Else, you will need to generate a Firebase app.         // Verify why need firebase
+Else, you will need to generate a Firebase app.
 ```bash
 Firebase part
 Add Procedure:
@@ -106,7 +108,7 @@ Paste file my-release-key.keystore
 $ zipalign -v 4 app-release-unsigned.apk projecty-signed.apk 
 
 ## Verify signature (ignore warnings)
-$ apksigner verify --verbose projecty-signed.apk 
+$ apksigner verify --verbose projecty-signed.apk
 
 ## This generates a final release binary called projecty-signed.apk that can be accepted into the Google Play Store.
 ```
@@ -144,12 +146,21 @@ Releasing your application on Google Play is a simple process that involves thre
     If you are satisfied that your publishing settings are correctly configured and your uploaded application is ready to be released to the public, you can simply click Publish in the Play Console and within minutes your application will be live and available for download around the world.
 
 ## The big release day
-https://positive-stud.medium.com/how-to-publish-an-android-app-on-google-play-store-cd163919e4d2
+### Requirements
+For creating your own Google Play Developer Account, your age should be at least above 18 years old. If you pass this age criterion, you can use your Google account to sign up for a Developer Account. After then, you will have to accept the Developer Distribution Agreement and pay the one-time registration fee of $25. For Registration fee payment, you can use MasterCard, Visa, American Express, Discover (the U.S. only), Visa Electron (Outside of the U.S. only). Finally, you will be required to complete your account details.
+
+> Signup here: https://play.google.com/apps/publish/signup
+>
+> Login here: https://play.google.com/apps/publish
+
+After login, everything is intuitive. Will have a big blue button "Create app" which will guide you to publish your first app.
 
 ## References
 
 [Positive stud - What is an APK File? Difference Between Building an Android APK and Generating Signed APK file. (Aug 11, 2020)](https://positive-stud.medium.com/what-is-an-apk-file-difference-between-building-an-android-apk-and-generating-signed-apk-file-3a4bcc380840)
 
 [Google - Publish your app](https://developer.android.com/studio/publish)
+
+[Positive stud - How to publish an Android App on Google Play Store? (Aug 14, 2020)](https://positive-stud.medium.com/how-to-publish-an-android-app-on-google-play-store-cd163919e4d2)
 
 ## Leonardo Zanotti
