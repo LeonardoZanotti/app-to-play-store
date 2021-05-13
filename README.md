@@ -12,34 +12,24 @@ As for the developer, an unsigned APK file is developed mainly for local testing
 Now, talking about generating signed APK files, it is secured by a Keystore credential made by the developer and includes a password for the security purpose. Therefore, Signed APK cannot be easily unzipped and mainly used for production purposes. In conclusion, if you are generating a signed APK file, it is more secure and also acceptable in Google Play Store.
 
 ## Guide to Generate a signed APK using Android Studio
-First, clone the project, enter the correct branch and install it, npm install, etc.
-Then add the following in the package.json scripts
-```bash
-"cordova:prepare": "ngx-scripts cordova prepare",
-"cordova:run": "ngx-scripts cordova run",
-"cordova:build": "ngx-scripts cordova build --device --release --copy www",
-"cordova:clean": "ngx-scripts clean",
-"cordova": "ngx-scripts cordova",
-```
+First, clone the project, enter the correct branch and install it, npm install, etc. It's important to fix that the project should be a ngx-rocket project cordova-based with ionic.
 
 To build Android apps you will need [Android SDK](https://developer.android.com/studio).
-
-After this, just do the following commands:
+Remember to declare the paths of the sdk in your ~/.bashrc:
 ```bash
-$ sudo add-apt-repository ppa:cwchien/gradle    ## add a gradle ppa repository 
-$ sudo apt update                               ## update apt repositories to get the new ppa
-$ sudo apt install gradle zipalign apksigner    ## install all dependencies to build android
-$ npm i cordova                                 ## add cordova to the project
-$ npm run cordova platform add android          ## add android platform
-$ npm run cordova:prepare android               ## prepare build
+export ANDROID_SDK_ROOT=$HOME/Android/Sdk
+export PATH=$PATH:$ANDROID_SDK_ROOT/tools/bin
+export PATH=$PATH:$ANDROID_SDK_ROOT/platform-tools
+export PATH=$PATH:$ANDROID_SDK_ROOT/emulator
+export PATH=$PATH:$ANDROID_SDK_ROOT/build-tools
 ```
 
-If you are updating an existing app, open file config.xml and increment android-versionCode by 1.
+Open file `config.xml` and change the id in the `widget` tag to something like "com.your-company.your-app-name". If you are updating an existing app, increment the version of the app in this file (else Google Play will not accept the build).
 
-Else, you will need to generate a Firebase app.
+If you are creating your first app and have something like pusher notifications, you will need to generate a Firebase app.
 ```bash
 Firebase part
-Add Procedure:
+Add procedure:
     Go to https://firebase.google.com/
     Click on "GO TO CONSOLE"
     Click on "Add Project"
@@ -51,7 +41,7 @@ Add Procedure:
     Click on download google-services.json
     Move this file to /platforms/android/app
 
-Remove Procedure:
+Remove procedure:
     Go to https://firebase.google.com/
     Click on "GO TO CONSOLE"
     Settings -> Project Settings -> Delete this App
@@ -59,8 +49,15 @@ Remove Procedure:
     Enter project ID and press delete
 ```
 
-Now we can really build the app:
+After this, just do the following commands:
 ```bash
+$ sudo add-apt-repository ppa:cwchien/gradle    ## add a gradle ppa repository 
+$ sudo apt update                               ## update apt repositories to get the new ppa
+$ sudo apt install gradle zipalign apksigner    ## install all dependencies to build android
+$ npm i -g cordova                              ## add cordova to the project
+$ mkdir www                                     ## create www dir, where the build files will be
+$ npm run cordova platform add android          ## add android platform
+$ npm run cordova:prepare android               ## prepare build
 $ npm run cordova:build android                 ## build android
 ```
 
@@ -79,8 +76,8 @@ Paste file app-release-unsigned.apk
 
 ## If you are just updating the app, you can skip the next two commands and go right to jarsigner
 ## Generate a signing key in JKS format and then convert it to PKCS12
-$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000 
-$ keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-release-key.keystore -deststoretype pkcs12 
+$ keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000
+$ keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-release-key.keystore -deststoretype pkcs12
 
 ## Once this last command has been ran and its prompts have been answered a file called my-release-key.keystore will be created in the current directory. 
 
@@ -90,22 +87,23 @@ $ keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-
 ###
 
 ## Sign the app
-$ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore app-release-unsigned.apk alias_name 
+$ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore app-release-unsigned.apk alias_name
 
-## If you are in Windows, do this, else just go ahead
-Copy file app-release-unsigned.apk 
-Copy file my-release-key.keystore 
-Go to folder C:\Program Files (x86)\Android\android-sdk\build-tools\28.0.3 
-Delete app-release-unsigned.apk if file exists. 
-Delete HelloWorld.apk if file exists. 
-Delete my-release-key.keystore if file exists. 
-Delete Welever.apk if file exists. 
-Paste file app-release-unsigned.apk 
-Paste file my-release-key.keystore 
+## If you are in Windows do this, else just go ahead
+Copy file app-release-unsigned.apk
+Copy file my-release-key.keystore
+Go to folder C:\Program Files (x86)\Android\android-sdk\build-tools\28.0.3
+Delete app-release-unsigned.apk if file exists.
+Delete HelloWorld.apk if file exists.
+Delete my-release-key.keystore if file exists.
+Delete Welever.apk if file exists.
+Delete projecty-signed.apk if file exists.
+Paste file app-release-unsigned.apk
+Paste file my-release-key.keystore
 ## Windows part ends
 
 ## Optimize the APK
-$ zipalign -v 4 app-release-unsigned.apk projecty-signed.apk 
+$ zipalign -v 4 app-release-unsigned.apk projecty-signed.apk
 
 ## Verify signature (ignore warnings)
 $ apksigner verify --verbose projecty-signed.apk
