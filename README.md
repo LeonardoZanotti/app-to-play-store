@@ -24,7 +24,7 @@ export PATH=$PATH:$ANDROID_SDK_ROOT/emulator
 export PATH=$PATH:$ANDROID_SDK_ROOT/build-tools
 ```
 
-Open file `config.xml` and change the id in the `widget` tag to something like "com.your-company.your-app-name". If you are updating an existing app, increment the version of the app in this file (else Google Play will not accept the build).
+Open file `config.xml` and change the id in the `widget` tag to something like "com.yourcompany.yourappname". If you are updating an existing app, increment the version of the app in this file (else Google Play will not accept the build).
 
 If you are creating your first app and have something like pusher notifications, you will need to generate a Firebase app.
 ```bash
@@ -86,9 +86,6 @@ $ keytool -importkeystore -srckeystore my-release-key.keystore -destkeystore my-
 ### lost the Google Play Store will not accept updates for this app!
 ###
 
-## Sign the app
-$ jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore app-release-unsigned.apk alias_name
-
 ## If you are in Windows do this, else just go ahead
 Copy file app-release-unsigned.apk
 Copy file my-release-key.keystore
@@ -103,7 +100,10 @@ Paste file my-release-key.keystore
 ## Windows part ends
 
 ## Optimize the APK
-$ zipalign -v 4 app-release-unsigned.apk projecty-signed.apk
+$ zipalign -v 4 app-release-unsigned.apk projecty-unsigned.apk
+
+## Sign the app with JAR Signature Schema V1 and APK Signature Schema V2
+$ apksigner sign --verbose --ks my-release-key.keystore --ks-key-alias alias_name --out projecty-signed.apk projecty-unsigned.apk 
 
 ## Verify signature (ignore warnings)
 $ apksigner verify --verbose projecty-signed.apk
@@ -160,5 +160,7 @@ After login, everything is intuitive. Will have a big blue button "Create app" w
 [Google - Publish your app](https://developer.android.com/studio/publish)
 
 [Positive stud - How to publish an Android App on Google Play Store? (Aug 14, 2020)](https://positive-stud.medium.com/how-to-publish-an-android-app-on-google-play-store-cd163919e4d2)
+
+[Apksigner - Google](https://developer.android.com/studio/command-line/apksigner)
 
 ## Leonardo Zanotti
