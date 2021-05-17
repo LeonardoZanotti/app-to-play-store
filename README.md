@@ -3,6 +3,11 @@
 # Build and publish an Ngx-Rocket Cordova Ionic app in Play Store
 How to build an Android app in Android Studio and publish it in the Google Play Store.
 
+### Generate docx of this guide
+```bash
+$ pandoc -o output.docx -f markdown -t docx README.md 
+```
+
 ## APK file
 APK refers to the Android Package Kit (also Android Application Package) which is used in the Android operating system for the distribution and installation of mobile apps. For instance, you tend to use .exe file for installing software in your PC, similarly, .apk files are used to install Android application on your phone.
 
