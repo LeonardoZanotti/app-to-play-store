@@ -3,9 +3,10 @@
 # Build and publish an Ngx-Rocket Cordova Ionic app in Play Store
 How to build an Android app in Android Studio and publish it in the Google Play Store.
 
-### Generate docx of this guide
+### Convert this guide
 ```bash
-$ pandoc -o output.docx -f markdown -t docx README.md 
+$ pandoc -o output.docx -f markdown -t docx README.md   ## docx
+$ pandoc -o output.pdf README.md                        ## pdf
 ```
 
 ## APK file
@@ -31,6 +32,40 @@ export PATH=$PATH:$ANDROID_SDK_ROOT/build-tools
 
 Open file `config.xml` and change the id in the `widget` tag to something like "com.yourcompany.yourappname". If you are updating an existing app, increment the version of the app in this file (else Google Play will not accept the build).
 
+**Requirements**
+```bash
+$ sudo add-apt-repository ppa:cwchien/gradle    ## add a gradle ppa repository 
+$ sudo apt update                               ## update apt repositories to get the new ppa
+$ sudo apt install gradle zipalign apksigner    ## install all dependencies to build android
+$ npm i -g cordova                              ## install cordova globally
+$ npm run cordova requirements                  ## check if all requirements are satisfied
+```
+
+Verify cordova versions, should be at least the following:
+```json
+"dependencies": {
+    "cordova-android": "^9.0.0",
+    "cordova-custom-config": "^5.1.0",
+    "cordova-ios": "^6.1.0",
+    "cordova-plugin-device": "^2.0.3",
+    "cordova-plugin-ionic-webview": "^5.0.0",
+    "cordova-plugin-ionic-keyboard": "^2.2.0",
+    "cordova-plugin-splashscreen": "^6.0.0",
+    "cordova-plugin-statusbar": "^2.4.3",
+    "cordova-plugin-whitelist": "^1.3.4"
+},
+"devDependencies": {
+    "cordova": "^10.0.0"
+}
+```
+
+After this, just do the following commands:
+```bash
+$ mkdir www                                     ## create www dir, where the build files will be
+$ npm run cordova platform add android          ## add android platform
+$ npm run cordova:prepare android               ## prepare build
+```
+
 If you are creating your first app and have something like pusher notifications, you will need to generate a Firebase app.
 ```bash
 Firebase part
@@ -54,15 +89,8 @@ Remove procedure:
     Enter project ID and press delete
 ```
 
-After this, just do the following commands:
+Finally, build the app:
 ```bash
-$ sudo add-apt-repository ppa:cwchien/gradle    ## add a gradle ppa repository 
-$ sudo apt update                               ## update apt repositories to get the new ppa
-$ sudo apt install gradle zipalign apksigner    ## install all dependencies to build android
-$ npm i -g cordova                              ## add cordova to the project
-$ mkdir www                                     ## create www dir, where the build files will be
-$ npm run cordova platform add android          ## add android platform
-$ npm run cordova:prepare android               ## prepare build
 $ npm run cordova:build android                 ## build android
 ```
 
