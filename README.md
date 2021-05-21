@@ -89,9 +89,17 @@ Remove procedure:
     Enter project ID and press delete
 ```
 
-Finally, build the app:
+Finally, build the app with one of the following commands:
 ```bash
-$ npm run cordova:build android                 ## build android
+$ npm run cordova:build android                 ## build android default config
+$ npm run cordova:build-demo android            ## build android demo config
+$ npm run cordova:build-prod android            ## build android prod config
+```
+
+The demo and prod build scripts are defined in the `package.json` as following:
+```json
+"cordova:build-demo": "ngx-scripts cordova build --device --debug --configuration=demo --copy www",
+"cordova:build-prod": "ngx-scripts cordova build --device --prod --release --copy www",
 ```
 
 If build succeed, lets finish it:
@@ -195,5 +203,7 @@ After login, everything is intuitive. Will have a big blue button "Create app" w
 [Positive stud - How to publish an Android App on Google Play Store? (Aug 14, 2020)](https://positive-stud.medium.com/how-to-publish-an-android-app-on-google-play-store-cd163919e4d2)
 
 [Apksigner - Google](https://developer.android.com/studio/command-line/apksigner)
+
+[Ionic Cordova build docuemntation](https://ionicframework.com/docs/cli/commands/cordova-build)
 
 ## Leonardo Zanotti
